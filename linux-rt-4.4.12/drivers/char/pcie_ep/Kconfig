@@ -1,0 +1,12 @@
+#
+# 66ak2h keystone pcie endpoint support
+#
+	  
+config TI_k2H_PCIE_EPDRV
+        tristate "TI 66AK2H PCIe Endpoint Driver"
+#        depends on !PCI
+        help
+	  This option builds driver required for controlling PCIe configuration
+	  of 66AK2H Endpoint device it is running on. A device with name
+	  "ti_k2h_pcie_ep" is created to enable application to control the
+	  device using ioctls provided. Use 'M' to build as module.
