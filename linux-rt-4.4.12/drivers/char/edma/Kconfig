@@ -1,0 +1,8 @@
+#
+# 66ak2h keystone pcie endpoint support
+#
+	  
+config TI_k2H_EDMA
+        tristate "TI 66AK2H EDMA Driver"
+        help
+	  This option builds driver required for controlling EDMA modules.

@@ -37,6 +37,18 @@ void complete(struct completion *x)
 }
 EXPORT_SYMBOL(complete);
 
+void ltea_complete(struct completion *x)
+{
+	unsigned long flags;
+
+	//raw_spin_lock_irqsave(&x->wait.lock, flags);
+	x->done++;
+	swake_up_locked(&x->wait);
+	//raw_spin_unlock_irqrestore(&x->wait.lock, flags);
+}
+EXPORT_SYMBOL(ltea_complete);
+
+
 /**
  * complete_all: - signals all threads waiting on this completion
  * @x:  holds the state of this particular completion
@@ -122,6 +134,34 @@ void __sched wait_for_completion(struct completion *x)
 	wait_for_common(x, MAX_SCHEDULE_TIMEOUT, TASK_UNINTERRUPTIBLE);
 }
 EXPORT_SYMBOL(wait_for_completion);
+
+
+
+static inline long __sched
+__ltea_wait_for_common(struct completion *x,
+		  long (*action)(long), long timeout, int state)
+{
+	might_sleep();
+
+	//raw_spin_lock_irq(&x->wait.lock);
+	timeout = do_wait_for_common(x, action, timeout, state);
+	//raw_spin_unlock_irq(&x->wait.lock);
+	return timeout;
+}
+static long __sched
+ltea_wait_for_common(struct completion *x, long timeout, int state)
+{
+	return __ltea_wait_for_common(x, schedule_timeout, timeout, state);
+}
+
+void __sched ltea_wait_for_completion(struct completion *x)
+{
+	ltea_wait_for_common(x, MAX_SCHEDULE_TIMEOUT, TASK_UNINTERRUPTIBLE);
+}
+EXPORT_SYMBOL(ltea_wait_for_completion);
+
+
+
 
 /**
  * wait_for_completion_timeout: - waits for completion of a task (w/timeout)

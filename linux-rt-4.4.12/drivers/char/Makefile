@@ -61,3 +61,4 @@ js-rtc-y = rtc.o
 obj-$(CONFIG_TILE_SROM)		+= tile-srom.o
 obj-$(CONFIG_XILLYBUS)		+= xillybus/
 obj-$(CONFIG_TI_k2H_PCIE_EPDRV)		+= pcie_ep/
+obj-$(CONFIG_TI_k2H_EDMA)		+= edma/

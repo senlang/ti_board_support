@@ -305,7 +305,62 @@
 			num-lanes = <2>;
 			status = "disabled";
 		};
-
+		
+		edma-controller@02700000 {	/* edma3 irq chip */
+			device_type = "dma";
+			compatible = "ti,keystone2-edma";
+			reg  = <0x02700000 0x000C0000>;	
+			/* HW Interrupts mapped to EDMA pins */
+			interrupts = <0 314 0xf01>,
+				<0 315 0xf01>,
+				<0 316 0xf01>,
+				<0 317 0xf01>,
+				<0 318 0xf01>,
+				<0 319 0xf01>,
+				<0 320 0xf01>,
+				<0 321 0xf01>,
+				<0 322 0xf01>,
+				<0 323 0xf01>,
+				<0 324 0xf01>,
+				<0 325 0xf01>,
+				<0 326 0xf01>,
+				<0 327 0xf01>,
+				<0 328 0xf01>,
+				<0 329 0xf01>,				
+				<0 330 0xf01>,
+				<0 331 0xf01>,
+				<0 332 0xf01>,
+				<0 333 0xf01>,
+				<0 334 0xf01>,
+				<0 335 0xf01>,
+				<0 336 0xf01>,
+				<0 337 0xf01>,
+				<0 338 0xf01>,
+				<0 339 0xf01>,	
+				<0 340 0xf01>,
+				<0 341 0xf01>,
+				<0 342 0xf01>,
+				<0 343 0xf01>,
+				<0 344 0xf01>,
+				<0 345 0xf01>,
+				<0 346 0xf01>,
+				<0 347 0xf01>,
+				<0 348 0xf01>,
+				<0 349 0xf01>,	
+				<0 350 0xf01>,
+				<0 351 0xf01>,
+				<0 352 0xf01>,
+				<0 353 0xf01>,
+				<0 354 0xf01>,
+				<0 355 0xf01>,
+				<0 356 0xf01>,
+				<0 357 0xf01>,
+				<0 358 0xf01>;
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+	
+		
 		pci-controller@21800000 {
 			device_type = "pci";
 			#address-cells = <3>;

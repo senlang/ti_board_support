@@ -745,9 +745,9 @@ static irqreturn_t keystone_msi_handler(int irq, void *dev)
 		atomic_inc(&counter);
 		//wake_up_interruptible(&readq);
 
-		pcie_src_addr = __raw_readl(mem_reg_vir + PCIE_SRC_ADDR(offset));
-		pcie_dest_addr = __raw_readl(mem_reg_vir + PCIE_DEST_ADDR(offset));
-		data_size = __raw_readl(mem_reg_vir + PCIE_SIZE(offset));
+		pcie_src_addr = __raw_readl(ks2reg_vir + PCIE_SRC_ADDR(offset));
+		pcie_dest_addr = __raw_readl(ks2reg_vir + PCIE_DEST_ADDR(offset));
+		data_size = __raw_readl(ks2reg_vir + PCIE_SIZE(offset));
 		
 //		printk("irq:src[0x%08x]dest[0x%08x]size[0x%08x]offset[%d]\n",pcie_src_addr,pcie_dest_addr,data_size,offset);
 
@@ -2328,11 +2328,13 @@ static int __init ti_k2h_ep_pcie_init(void)
 
 	
 	//ti_k2h_pcie_resource();
-#if 1//set inbound region
-	request_mem_region(PCIE_NON_PREFETCH_START,0x10000000, "pcie-nonprefetch-1");
-	request_mem_region(PCIE_NON_PREFETCH_START + 0x10000000,0x400000, "pcie-nonprefetch-2");
+
 	
-	ks2reg_vir = (u32)ioremap_nocache(PCIE_NON_PREFETCH_START + 0x10000000, 0x400000);
+#if 1//set inbound region
+	request_mem_region(PCIE_NON_PREFETCH_START, PCIE_NON_PREFETCH_SIZE, "pcie-nonprefetch-1");
+	request_mem_region(MEM_REG_START, MEM_REG_SIZE, "pcie-nonprefetch-2");
+	
+	ks2reg_vir = (u32)ioremap_nocache(MEM_REG_START, MEM_REG_SIZE);
 	if (!ks2reg_vir) {
 		pr_err(DRIVER_NAME ":request-ks2reg_vir failed in SharedRegion\n");
 		iounmap((void *)reg_vir);
@@ -2355,7 +2357,7 @@ static int __init ti_k2h_ep_pcie_init(void)
 		printk("in.BAR_num=%d\n",in.BAR_num);
 		if(in.BAR_num == 1)
 		{
-			in.internal_addr = PCIE_NON_PREFETCH_START + 0x10000000;
+			in.internal_addr = MEM_REG_START;
 			in.ib_start_hi = 0;
 			in.ib_start_lo = bar_info[i].bar_addr;
 		}
@@ -2384,20 +2386,10 @@ static int __init ti_k2h_ep_pcie_init(void)
 	printk("%s[%d]\n",__FUNCTION__,__LINE__);
 
 	
-	temp = __raw_readl(reg_vir + IB_OFFSET(1));
-	printk("memory register physical addr is 0x%08x\n",temp);
-	/*Request 4MB Memory from 0xB0C00000 ~ 0xB1000000,Use to save info between L2 and PC*/
-	mem_reg_vir = (u32)ioremap_nocache(temp, MEM_REG_SIZE);
-	if (!mem_reg_vir) {
-		pr_err(DRIVER_NAME ": register remapping failed");
-		iounmap((void *)reg_vir);
-		cdev_del(&ti_k2h_ep_pcie_cdev);
-		unregister_chrdev_region(ti_k2h_ep_pcie_dev, DEVICENO);
-		return -1;
-	}
+
 	
-	temp = __raw_readl(mem_reg_vir);
-	printk("mem_reg_vir is 0x%08x\n",temp);
+	temp = __raw_readl(ks2reg_vir);
+	printk("ks2reg_vir is 0x%08x\n",temp);
 	request_mem_region(PCIE_DATA_SPACE_START,256*1024*1024, "pcie-nonprefetch");
 
 	
@@ -2496,7 +2488,7 @@ static int __init ti_k2h_ep_pcie_init(void)
 	init_err:
 	//iounmap((void *)reg_mem);
 	iounmap((void *)reg_vir);
-	iounmap((void *)mem_reg_vir);
+	iounmap((void *)ks2reg_vir);
 	//iounmap((void *)res_mem);
 
 /*!@@@X 	iounmap((void *)mgmt_area_remap);*/
@@ -2530,7 +2522,7 @@ static void __exit ti_k2h_ep_pcie_exit(void)
 	
 	//iounmap((void *)reg_mem);
 	iounmap((void *)reg_vir);
-	iounmap((void *)mem_reg_vir);
+	iounmap((void *)ks2reg_vir);
 	//iounmap((void *)res_mem);
 	iounmap((void *)gpio_reg_va);
 

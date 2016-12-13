@@ -109,8 +109,15 @@
 #define CFG_PCIM_WIN_CNT		32
 #define CFG_PCIM_WIN_SZ_IDX		3
 
-#define PCIE_NON_PREFETCH_START		0xC0000000//0xB0000000//0xA3000000
-#define PCIE_NON_PREFETCH_SIZE		(128 * 1024 * 1024)
+#define MEM_REG_SIZE		(4 * 1024 * 1024)
+
+#define PCIE_NON_PREFETCH_START		0xF0000000//0xB0000000//0xA3000000
+#define PCIE_NON_PREFETCH_SIZE		(252 * 1024 * 1024)
+
+#define MEM_REG_START		(PCIE_NON_PREFETCH_START + PCIE_NON_PREFETCH_SIZE)//20160418 add
+
+
+
 
 //PCIE_PREFETCH_BASE_ADDRESS
 
@@ -130,8 +137,7 @@
 #define IPCGR0				0x0
 #define IPCAR0				0x40
 
-#define MEM_REG_START		PCIE_NON_PREFETCH_START + 0x10000000		//20160418 add
-#define MEM_REG_SIZE		(4 * 1024 * 1024)
+
 
 
 
@@ -252,24 +258,36 @@
 /////////////////////////////////////////////////////////////
 //开发板使用
 #define KS2_START_ADDR		0x0
-#define BAR_START_LO(n)		(KS2_START_ADDR + 0x0 + (0x10 * (n)))//层二板BAR0 起始地址
-#define BAR_START_HI(n)		(KS2_START_ADDR +0x4 + (0x10 * (n))	)//层二板BAR0 起始地址
-#define BAR_SIZE(n)			(KS2_START_ADDR +0x8 + (0x10 * (n)))
 
-#define BUFF_PA_LO 	(KS2_START_ADDR + 0x60)	//BufferPhysicalAddress,驱动所分配的用于层二板往PC 写数据
-#define BUFF_PA_HI 	(KS2_START_ADDR + 0x64)	//BufferPhysicalAddress,驱动所分配的用于层二板往PC 写数据
-#define BUFF_SIZE 	(KS2_START_ADDR + 0x68) //BufferPhysicalAddress,驱动所分配的用于层二板往PC 写数据
-#define BUFF_PA_END (KS2_START_ADDR + 0x6c)		//BufferPhysicalAddress,驱动所分配的用于层二板往PC 写数据
+#define L2B_BD_VER				(KS2_START_ADDR + 0x00)
+#define L2B_BD_SN1				(KS2_START_ADDR + 0x04)
+#define L2B_BD_SN2				(KS2_START_ADDR + 0x08)
+#define L2B_BD_STATUS			(KS2_START_ADDR + 0x0C)
+#define L2B_SAVE_MODE			(KS2_START_ADDR + 0x10)
 
 
-#define WRITE_START_ADDR_LO	(KS2_START_ADDR + 0x70)
-#define READ_START_ADDR_LO	(KS2_START_ADDR + 0x74)
+#define L2CARD_STATUS			(KS2_START_ADDR + 0x500 + 0x00)//层二板状态
+#define L2CARD_CONTROL			(KS2_START_ADDR + 0x500 + 0x04)//层二板状态
 
-#define WRITE_END_ADDR_LO	(KS2_START_ADDR + 0x80)
-#define WRITE_LOOP_COUNT	(KS2_START_ADDR + 0x84)
-#define READ_END_ADDR_LO	(KS2_START_ADDR + 0x88)
-#define READ_LOOP_COUNT		(KS2_START_ADDR + 0x8C)
 
+
+#define BAR_START_LO(n)		(KS2_START_ADDR + 0x40 + 0x0 + (0x10 * (n)))//层二板BAR0 起始地址
+#define BAR_START_HI(n)		(KS2_START_ADDR + 0x40 + 0x4 + (0x10 * (n))	)//层二板BAR0 起始地址
+#define BAR_SIZE(n)			(KS2_START_ADDR + 0x40 + 0x8 + (0x10 * (n)))
+
+#define BUFF_PA_LO 	(KS2_START_ADDR + 0x40 + 0x60)	//BufferPhysicalAddress,驱动所分配的用于层二板往PC 写数据
+#define BUFF_PA_HI 	(KS2_START_ADDR + 0x40 + 0x64)	//BufferPhysicalAddress,驱动所分配的用于层二板往PC 写数据
+#define BUFF_SIZE 	(KS2_START_ADDR + 0x40 + 0x68) //BufferPhysicalAddress,驱动所分配的用于层二板往PC 写数据
+#define BUFF_PA_END (KS2_START_ADDR + 0x40 + 0x40  + 0x6c)		//BufferPhysicalAddress,驱动所分配的用于层二板往PC 写数据
+
+
+#define WRITE_START_ADDR_LO	(KS2_START_ADDR + 0x40 + 0x70)
+#define READ_START_ADDR_LO	(KS2_START_ADDR + 0x40 + 0x74)
+
+#define WRITE_END_ADDR_LO	(KS2_START_ADDR + 0x40 + 0x80)
+#define WRITE_LOOP_COUNT	(KS2_START_ADDR + 0x40 + 0x84)
+#define READ_END_ADDR_LO	(KS2_START_ADDR + 0x40 + 0x88)
+#define READ_LOOP_COUNT		(KS2_START_ADDR + 0x40 + 0x8C)
 
 
 #define L1CARD_NUM							(KS2_START_ADDR + 0x100)
@@ -314,11 +332,6 @@
 #define L2MEM_READ_INDEX		(KS2_START_ADDR + 0x420 + 0x10)//读指针位置
 #define L2MEM_DATA_BUFF_SIZE	(KS2_START_ADDR + 0x420 + 0x14)//Data buffer size
 #define L2MEM_PCIE_ADDR			(KS2_START_ADDR + 0x420 + 0x18)//
-
-
-
-#define L2CARD_STATUS			(KS2_START_ADDR + 0x500 + 0x00)//层二板状态
-#define L2CARD_CONTROL			(KS2_START_ADDR + 0x500 + 0x04)//层二板状态
 
 
 #endif

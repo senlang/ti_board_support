@@ -72,6 +72,33 @@ uint32_t	is_list_empty(struct list_head *phead)
 		return _FALSE;	
 }
 
+void _init_listhead(_list *list)
+{
+	INIT_LIST_HEAD(list);
+}
+
+void	_init_queue(_queue	*pqueue)
+{
+	_init_listhead(&(pqueue->queue));
+	spin_lock_init(&pqueue->lock);
+	sema_init(&pqueue->queue_sema, 1);
+}
+
+void list_insert_tail(_list *plist, _list *phead)
+{
+	list_add_tail(plist, phead);
+}
+
+
+
+
+
+void	init_tx_queue(void)
+{
+	_init_queue(&(ptxpriv.transfer_queue));
+}
+
+
 uint32_t queue_empty(void)
 {
 	uint32_t retval;
@@ -86,29 +113,6 @@ uint32_t queue_empty(void)
 	return retval;
 }
 
-void _init_listhead(_list *list)
-{
-	INIT_LIST_HEAD(list);
-}
-
-void	_init_queue(_queue	*pqueue)
-{
-	_init_listhead(&(pqueue->queue));
-	spin_lock_init(&pqueue->lock);
-	sema_init(&pqueue->queue_sema, 1);
-}
-
-void	init_tx_queue(void)
-{
-	_init_queue(&(ptxpriv.transfer_queue));
-}
-
-
-
-void list_insert_tail(_list *plist, _list *phead)
-{
-	list_add_tail(plist, phead);
-}
 
 
 int	enqueue_cmd(_queue *queue, struct data_obj *obj)

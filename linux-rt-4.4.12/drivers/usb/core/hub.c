@@ -1674,6 +1674,8 @@ static void hub_disconnect(struct usb_interface *intf)
 	struct usb_device *hdev = interface_to_usbdev(intf);
 	int port1;
 
+	printk("langsen debug:%s[%d]\n",__FUNCTION__,__LINE__);
+
 	/*
 	 * Stop adding new hub events. We do not want to block here and thus
 	 * will not try to remove any pending work item.
@@ -1717,6 +1719,8 @@ static int hub_probe(struct usb_interface *intf, const struct usb_device_id *id)
 	struct usb_endpoint_descriptor *endpoint;
 	struct usb_device *hdev;
 	struct usb_hub *hub;
+
+	printk("langsen debug:%s[%d]\n",__FUNCTION__,__LINE__);
 
 	desc = intf->cur_altsetting;
 	hdev = interface_to_usbdev(intf);
@@ -4682,6 +4686,7 @@ static void hub_port_connect(struct usb_hub *hub, int port1, u16 portstatus,
 	struct usb_device *udev = port_dev->child;
 	static int unreliable_port = -1;
 
+	printk("langsen debug:%s[%d]\n",__FUNCTION__,__LINE__);
 	/* Disconnect any existing devices under this port */
 	if (udev) {
 		if (hcd->usb_phy && !hdev->parent)
@@ -4900,6 +4905,11 @@ static void hub_port_connect_change(struct usb_hub *hub, int port1,
 	int status = -ENODEV;
 	dev_dbg(&port_dev->dev, "status %04x, change %04x, %s\n", portstatus,
 			portchange, portspeed(hub, portstatus));
+	
+	printk("langsen debug:%s[%d]\n",__FUNCTION__,__LINE__);
+	printk("status %04x, change %04x, %s\n", portstatus,
+			portchange, portspeed(hub, portstatus));
+	
 
 	if (hub->has_indicators) {
 		set_port_led(hub, port1, HUB_LED_AUTO);
@@ -4933,11 +4943,14 @@ static void hub_port_connect_change(struct usb_hub *hub, int port1,
 		}
 	}
 	clear_bit(port1, hub->change_bits);
-
+	printk("langsen debug:%s[%d]\n",__FUNCTION__,__LINE__);
+	
 	/* successfully revalidated the connection */
 	if (status == 0)
 		return;
 
+	
+	printk("langsen debug:%s[%d]\n",__FUNCTION__,__LINE__);
 	usb_unlock_port(port_dev);
 	hub_port_connect(hub, port1, portstatus, portchange);
 	usb_lock_port(port_dev);
@@ -4951,6 +4964,8 @@ static void port_event(struct usb_hub *hub, int port1)
 	struct usb_device *udev = port_dev->child;
 	struct usb_device *hdev = hub->hdev;
 	u16 portstatus, portchange;
+	
+	printk("langsen debug:%s[%d]\n",__FUNCTION__,__LINE__);
 
 	connect_change = test_bit(port1, hub->change_bits);
 	clear_bit(port1, hub->event_bits);
@@ -5062,6 +5077,8 @@ static void hub_event(struct work_struct *work)
 	hdev = hub->hdev;
 	hub_dev = hub->intfdev;
 	intf = to_usb_interface(hub_dev);
+
+	printk("langsen debug:%s[%d]\n",__FUNCTION__,__LINE__);
 
 	dev_dbg(hub_dev, "state %d ports %d chg %04x evt %04x\n",
 			hdev->state, hdev->maxchild,

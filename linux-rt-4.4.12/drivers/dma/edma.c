@@ -36,6 +36,16 @@
 #include "dmaengine.h"
 #include "virt-dma.h"
 
+#ifdef dev_dbg
+#undef dev_dbg
+#define dev_dbg(dev, format, arg...)		\
+	dev_printk(KERN_INFO, dev, format, ##arg)
+#else
+#define dev_dbg(dev, format, arg...)		\
+	dev_printk(KERN_INFO, dev, format, ##arg)
+#endif
+
+
 /* Offsets matching "struct edmacc_param" */
 #define PARM_OPT		0x00
 #define PARM_SRC		0x04
@@ -1920,6 +1930,8 @@ static int edma_setup_from_hw(struct device *dev, struct edma_soc_info *pdata,
 
 	ecc->chmap_exist = (cccfg & CHMAP_EXIST) ? true : false;
 
+	printk("%s[%d]\n",__FUNCTION__,__LINE__);
+
 	dev_dbg(dev, "eDMA3 CC HW configuration (cccfg: 0x%08x):\n", cccfg);
 	dev_dbg(dev, "num_region: %u\n", ecc->num_region);
 	dev_dbg(dev, "num_channels: %u\n", ecc->num_channels);
@@ -1927,6 +1939,21 @@ static int edma_setup_from_hw(struct device *dev, struct edma_soc_info *pdata,
 	dev_dbg(dev, "num_slots: %u\n", ecc->num_slots);
 	dev_dbg(dev, "num_tc: %u\n", ecc->num_tc);
 	dev_dbg(dev, "chmap_exist: %s\n", ecc->chmap_exist ? "yes" : "no");
+
+
+
+
+
+
+	printk("eDMA3 CC HW configuration (cccfg: 0x%08x):\n", cccfg);
+	printk("num_region: %u\n", ecc->num_region);
+	printk("num_channels: %u\n", ecc->num_channels);
+	printk("num_qchannels: %u\n", ecc->num_qchannels);
+	printk("num_slots: %u\n", ecc->num_slots);
+	printk("num_tc: %u\n", ecc->num_tc);
+	printk("chmap_exist: %s\n", ecc->chmap_exist ? "yes" : "no");
+
+
 
 	/* Nothing need to be done if queue priority is provided */
 	if (pdata->queue_priority_mapping)
@@ -2171,6 +2198,8 @@ static int edma_probe(struct platform_device *pdev)
 	struct edma_cc		*ecc;
 	bool			legacy_mode = true;
 	int ret;
+	
+	printk("%s[%d]\n",__FUNCTION__,__LINE__);
 
 	if (node) {
 		const struct of_device_id *match;
@@ -2223,6 +2252,8 @@ static int edma_probe(struct platform_device *pdev)
 		}
 	}
 	ecc->base = devm_ioremap_resource(dev, mem);
+
+	printk("%s[%d]ecc->base=%p\n",__FUNCTION__,__LINE__,ecc->base);
 	if (IS_ERR(ecc->base))
 		return PTR_ERR(ecc->base);
 
@@ -2464,6 +2495,8 @@ static struct platform_driver edma_driver = {
 
 static int edma_tptc_probe(struct platform_device *pdev)
 {
+	printk("%s[%d]\n",__FUNCTION__,__LINE__);
+
 	pm_runtime_enable(&pdev->dev);
 	return pm_runtime_get_sync(&pdev->dev);
 }
@@ -2497,10 +2530,12 @@ static int edma_init(void)
 {
 	int ret;
 
+	printk("%s[%d]\n",__FUNCTION__,__LINE__);
 	ret = platform_driver_register(&edma_tptc_driver);
 	if (ret)
 		return ret;
-
+	
+	printk("%s[%d]\n",__FUNCTION__,__LINE__);
 	return platform_driver_register(&edma_driver);
 }
 subsys_initcall(edma_init);

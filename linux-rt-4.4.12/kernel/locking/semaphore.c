@@ -88,6 +88,24 @@ int down_interruptible(struct semaphore *sem)
 }
 EXPORT_SYMBOL(down_interruptible);
 
+
+int ltea_down_interruptible(struct semaphore *sem)
+{
+	unsigned long flags;
+	int result = 0;
+
+	//raw_spin_lock_irqsave(&sem->lock, flags);
+	if (likely(sem->count > 0))
+		sem->count--;
+	else
+		result = __down_interruptible(sem);
+	//raw_spin_unlock_irqrestore(&sem->lock, flags);
+
+	return result;
+}
+EXPORT_SYMBOL(ltea_down_interruptible);
+
+
 /**
  * down_killable - acquire the semaphore unless killed
  * @sem: the semaphore to be acquired
@@ -187,6 +205,26 @@ void up(struct semaphore *sem)
 	raw_spin_unlock_irqrestore(&sem->lock, flags);
 }
 EXPORT_SYMBOL(up);
+
+
+
+
+
+
+void ltea_up(struct semaphore *sem)
+{
+	unsigned long flags;
+
+	//raw_spin_lock_irqsave(&sem->lock, flags);
+	if (likely(list_empty(&sem->wait_list)))
+		sem->count++;
+	else
+		__up(sem);
+	//raw_spin_unlock_irqrestore(&sem->lock, flags);
+}
+EXPORT_SYMBOL(ltea_up);
+
+
 
 /* Functions for the contended case */
 

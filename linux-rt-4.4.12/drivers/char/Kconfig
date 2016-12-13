@@ -603,6 +603,6 @@ config TILE_SROM
 	  
 source "drivers/char/xillybus/Kconfig"
 source "drivers/char/pcie_ep/Kconfig"
-
+source "drivers/char/edma/Kconfig"
 endmenu
 
